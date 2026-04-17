@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="3624 Match">
+  <meta name="theme-color" content="#D42027">
+  <link rel="manifest" href="manifest.json">
+  <title>3624 Soaring Colts — Match Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { font-family:'Rajdhani',sans-serif; background:#1A1A1A; color:#F0F0F0; min-height:100vh; overflow-x:hidden; }
+    #app { font-family:'Rajdhani',sans-serif; background:#1A1A1A; color:#F0F0F0; min-height:100vh; }
+    .hdr { background:linear-gradient(135deg,#1A1A1A,#2A2A2A); border-bottom:3px solid #D42027; padding:12px 16px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:100; }
+    .hdr-icon { width:44px; height:44px; border-radius:50%; background:#D42027; display:flex; align-items:center; justify-content:center; font-family:'Oswald',sans-serif; font-size:0.95rem; font-weight:700; color:#fff; }
+    .hdr h1 { font-family:'Oswald',sans-serif; font-size:1.2rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin:0; }
+    .hdr h1 span { color:#D42027; }
+    .hdr p { font-size:0.7rem; color:#F5C518; letter-spacing:3px; text-transform:uppercase; font-weight:600; margin:0; }
+    .screen { padding:20px 16px 30px; }
+    .sec-title { font-family:'Oswald',sans-serif; font-size:1rem; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#D42027; margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid #333; }
+    .sec-title.gold { color:#F5C518; }
+    .check-item { display:flex; align-items:center; gap:14px; padding:12px 14px; background:#2A2A2A; border:2px solid #333; border-radius:10px; margin-bottom:8px; cursor:pointer; transition:all 0.25s; user-select:none; }
+    .check-item.done { border-color:#2ECC40; background:rgba(46,204,64,0.08); }
+    .check-box { width:26px; height:26px; border-radius:7px; border:2px solid #888; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px; transition:all 0.25s; }
+    .check-item.done .check-box { border-color:#2ECC40; background:#2ECC40; color:#1A1A1A; }
+    .check-item.done .check-label { color:#2ECC40; }
+    .check-label { font-size:1rem; font-weight:500; }
+    .prog-bar-bg { width:100%; height:8px; background:#333; border-radius:4px; margin:10px 0 16px; overflow:hidden; }
+    .prog-bar { height:100%; background:linear-gradient(90deg,#D42027,#2ECC40); border-radius:4px; transition:width 0.4s ease; }
+    .prog-text { font-family:'Oswald',sans-serif; font-size:0.85rem; color:#888; letter-spacing:1px; }
+    .section-cat { font-family:'Oswald',sans-serif; font-size:0.82rem; letter-spacing:2px; text-transform:uppercase; color:#888; margin:16px 0 8px; }
+    .big-btn { width:100%; padding:22px; border:none; border-radius:14px; font-family:'Oswald',sans-serif; font-size:1.2rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; cursor:pointer; transition:transform 0.15s; margin-bottom:14px; display:block; }
+    .big-btn:active { transform:scale(0.97); }
+    .btn-green { background:#2ECC40; color:#0D3D13; }
+    .btn-red   { background:#D42027; color:#fff; }
+    .btn-grey  { background:#3A3A3A; color:#aaa; border:2px solid #444; }
+    .auto-choice-screen { text-align:center; padding:30px 16px; }
+    .auto-choice-screen h2 { font-family:'Oswald',sans-serif; font-size:1.6rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#F5C518; margin-bottom:8px; }
+    .auto-choice-screen p  { color:#aaa; font-size:1rem; margin-bottom:32px; }
+    .auto-btns { display:flex; flex-direction:column; gap:16px; }
+    .auto-btn-big { width:100%; padding:34px 20px; border:none; border-radius:16px; font-family:'Oswald',sans-serif; font-size:1.4rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; cursor:pointer; transition:transform 0.15s; }
+    .auto-btn-big:active { transform:scale(0.97); }
+    .auto-btn-big.won  { background:#2ECC40; color:#0D3D13; }
+    .auto-btn-big.lost { background:#D42027; color:#fff; }
+    .period-bar { background:#2A2A2A; border:2px solid #444; border-radius:12px; padding:14px 16px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; }
+    .period-name { font-family:'Oswald',sans-serif; font-size:1.1rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#F5C518; }
+    .next-info   { font-size:0.8rem; color:#888; margin-top:3px; font-family:'Rajdhani',sans-serif; }
+    .period-time { font-family:'Rajdhani',sans-serif; font-size:1.8rem; font-weight:700; color:#F0F0F0; }
+    .hub-card { padding:36px 28px; border-radius:14px; text-align:center; margin-bottom:14px; transition:background 0.4s, border-color 0.4s; }
+    .hub-card .hub-lbl    { font-family:'Oswald',sans-serif; font-size:0.85rem; letter-spacing:3px; text-transform:uppercase; margin-bottom:14px; }
+    .hub-card .hub-status { font-family:'Oswald',sans-serif; font-size:3.6rem; font-weight:700; letter-spacing:4px; line-height:1; }
+    .hub-card.active-hub   { background:#1A4D22; border:3px solid #2ECC40; }
+    .hub-card.active-hub   .hub-lbl    { color:#7EE89A; }
+    .hub-card.active-hub   .hub-status { color:#2ECC40; }
+    .hub-card.inactive-hub { background:#4D1A1A; border:3px solid #D42027; }
+    .hub-card.inactive-hub .hub-lbl    { color:#E88080; }
+    .hub-card.inactive-hub .hub-status { color:#FF3A42; }
+    .hub-card.waiting-hub  { background:#2A2A2A; border:2px solid #444; }
+    .hub-card.waiting-hub  .hub-lbl    { color:#888; }
+    .hub-card.waiting-hub  .hub-status { color:#888; font-size:2rem; }
+    .timeline-row { display:flex; align-items:center; gap:10px; padding:8px 0; opacity:0.3; transition:opacity 0.4s; }
+    .timeline-row.cur  { opacity:1; }
+    .timeline-row.past { opacity:0.55; }
+    .t-dot { width:12px; height:12px; border-radius:50%; border:2px solid #888; flex-shrink:0; transition:background 0.3s, border-color 0.3s; }
+    .timeline-row.cur  .t-dot { border-color:#F5C518; background:#F5C518; }
+    .timeline-row.past .t-dot { border-color:#2ECC40; background:#2ECC40; }
+    .t-info { font-size:0.9rem; color:#888; font-family:'Rajdhani',sans-serif; }
+    .timeline-row.cur .t-info { color:#F0F0F0; font-weight:600; }
+    .end-card { text-align:center; padding:40px 20px; }
+    .end-card h2 { font-family:'Oswald',sans-serif; font-size:1.9rem; color:#F5C518; letter-spacing:3px; text-transform:uppercase; }
+    .end-card p  { color:#888; margin:8px 0 28px; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-icon">3624</div>
+    <div>
+      <h1><span>3624</span> Soaring Colts</h1>
+      <p>Match Tracker</p>
+    </div>
+  </div>
+  <div id="root"></div>
+</div>
+<script>
+const stationChecks = ['Laptop','Charger','Ethernet','Dongle','ROCK','Jaden','Nate','All Cords Plugged In'];
+const fieldChecks   = ['Turn On Robot','Auto Aligned','8 Fuel','Pushed hopper in completely'];
+const allChecks     = [...stationChecks,...fieldChecks];
+
+const periods = [
+  {name:'TRANSITION', label:'2:20 \u2013 2:10', duration:10},
+  {name:'SHIFT 1',    label:'2:10 \u2013 1:45', duration:25},
+  {name:'SHIFT 2',    label:'1:45 \u2013 1:20', duration:25},
+  {name:'SHIFT 3',    label:'1:20 \u2013 0:55', duration:25},
+  {name:'SHIFT 4',    label:'0:55 \u2013 0:30', duration:25},
+  {name:'END GAME',   label:'0:30 \u2013 0:00', duration:30},
+];
+let t=0; periods.forEach(p=>{p.start=t; t+=p.duration; p.end=t;});
+const TOTAL=t;
+
+const hubIfWon  = ['ACTIVE','INACTIVE','ACTIVE','INACTIVE','ACTIVE','ACTIVE'];
+const hubIfLost = ['ACTIVE','ACTIVE','INACTIVE','ACTIVE','INACTIVE','ACTIVE'];
+
+let checks={}; allChecks.forEach(c=>checks[c]=false);
+let screen='checklist', autoWon=null, elapsed=0, periodIdx=-1, timer=null;
+
+function buzz(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
+
+function render(){
+  const root=document.getElementById('root');
+  if(screen==='checklist')       root.innerHTML=renderChecklist();
+  else if(screen==='autoResult') root.innerHTML=renderAutoResult();
+  else if(screen==='match')      root.innerHTML=renderMatchStatic();
+  else if(screen==='end')        root.innerHTML=renderEnd();
+  attachEvents();
+}
+
+function tickUpdate(){
+  const p = periodIdx>=0 ? periods[periodIdx] : null;
+  const rem = Math.max(0, TOTAL-elapsed);
+  const timeStr = `${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`;
+  const timeEl = document.getElementById('periodTime');
+  if(timeEl) timeEl.textContent = timeStr;
+  const nameEl = document.getElementById('periodName');
+  if(nameEl) nameEl.textContent = p ? p.name : '\u2014';
+  const nextEl = document.getElementById('nextInfo');
+  if(nextEl){
+    if(p && periodIdx < periods.length-1)
+      nextEl.textContent = `${periods[periodIdx+1].name} in ${p.end-elapsed}s`;
+    else if(periodIdx===periods.length-1)
+      nextEl.textContent = `Match ends in ${Math.max(0,TOTAL-elapsed)}s`;
+    else nextEl.textContent = '';
+  }
+  const hubCard = document.getElementById('hubCard');
+  const hubStatus = document.getElementById('hubStatus');
+  const hubLbl = document.getElementById('hubLbl');
+  if(hubCard && hubStatus && periodIdx>=0){
+    const s = autoWon ? hubIfWon[periodIdx] : hubIfLost[periodIdx];
+    hubCard.className = 'hub-card '+(s==='ACTIVE'?'active-hub':'inactive-hub');
+    hubStatus.textContent = s;
+    if(hubLbl) hubLbl.style.color = s==='ACTIVE'?'#7EE89A':'#E88080';
+  }
+  periods.forEach((_,i)=>{
+    const row = document.getElementById('trow'+i);
+    if(!row) return;
+    row.className = 'timeline-row' + (i<periodIdx?' past':'') + (i===periodIdx?' cur':'');
+  });
+}
+
+function renderChecklist(){
+  const done=allChecks.filter(c=>checks[c]).length, total=allChecks.length;
+  const pct=Math.round((done/total)*100), allDone=done===total;
+  let html=`<div class="screen">
+    <div class="sec-title gold">Pre-Match Checklist</div>
+    <div class="prog-text">${done} / ${total} complete</div>
+    <div class="prog-bar-bg"><div class="prog-bar" style="width:${pct}%"></div></div>
+    <div class="section-cat">Driver Station / In Queue</div>`;
+  stationChecks.forEach(c=>{
+    html+=`<div class="check-item${checks[c]?' done':''}" data-check="${c}">
+      <div class="check-box">${checks[c]?'&#10003;':''}</div>
+      <span class="check-label">${c}</span></div>`;
+  });
+  html+=`<div class="section-cat">Field</div>`;
+  fieldChecks.forEach(c=>{
+    html+=`<div class="check-item${checks[c]?' done':''}" data-check="${c}">
+      <div class="check-box">${checks[c]?'&#10003;':''}</div>
+      <span class="check-label">${c}</span></div>`;
+  });
+  if(allDone) html+=`<button class="big-btn btn-green" id="checklistDone" style="margin-top:20px;">&#10003; Checklist Done &rarr;</button>`;
+  return html+`</div>`;
+}
+
+function renderAutoResult(){
+  return `<div class="screen auto-choice-screen">
+    <h2>Auto Result</h2>
+    <p>Did we win auto?</p>
+    <div class="auto-btns">
+      <button class="auto-btn-big won"  id="autoWonBtn">&#10003; Won Auto</button>
+      <button class="auto-btn-big lost" id="autoLostBtn">&#10005; Lost Auto</button>
+    </div>
+  </div>`;
+}
+
+function renderMatchStatic(){
+  const autoBadge = autoWon
+    ?`<span style="font-family:'Oswald',sans-serif;font-size:0.75rem;padding:4px 14px;border-radius:6px;background:#1A4D22;color:#2ECC40;border:2px solid #2ECC40;letter-spacing:1px;">WON AUTO</span>`
+    :`<span style="font-family:'Oswald',sans-serif;font-size:0.75rem;padding:4px 14px;border-radius:6px;background:#4D1A1A;color:#FF3A42;border:2px solid #D42027;letter-spacing:1px;">LOST AUTO</span>`;
+  let timeline='';
+  periods.forEach((pp,i)=>{
+    timeline+=`<div class="timeline-row" id="trow${i}"><div class="t-dot"></div><div class="t-info">${pp.name} <span style="color:#555;font-size:0.8rem;">${pp.label}</span></div></div>`;
+  });
+  return `<div class="screen">
+    <div style="text-align:center;margin-bottom:14px;">${autoBadge}</div>
+    <div class="period-bar">
+      <div>
+        <div class="period-name" id="periodName">&mdash;</div>
+        <div class="next-info" id="nextInfo"></div>
+      </div>
+      <div class="period-time" id="periodTime">2:20</div>
+    </div>
+    <div class="hub-card waiting-hub" id="hubCard">
+      <div class="hub-lbl" id="hubLbl">Hub Status</div>
+      <div class="hub-status" id="hubStatus">WAITING</div>
+    </div>
+    <div class="sec-title" style="margin-top:20px;">Timeline</div>
+    ${timeline}
+    <button class="big-btn btn-grey" id="resetBtn" style="margin-top:24px;">&#8635; Reset</button>
+  </div>`;
+}
+
+function renderEnd(){
+  return `<div class="screen"><div class="end-card">
+    <h2>&#127937; Match Complete</h2>
+    <p>Good game, Colts!</p>
+    <button class="big-btn btn-red" id="resetBtn">&#8635; New Match</button>
+  </div></div>`;
+}
+
+function attachEvents(){
+  document.querySelectorAll('[data-check]').forEach(el=>{
+    el.addEventListener('click',()=>{ checks[el.dataset.check]=!checks[el.dataset.check]; buzz(30); render(); });
+  });
+  const cd=document.getElementById('checklistDone');
+  if(cd) cd.addEventListener('click',()=>{ screen='autoResult'; render(); });
+  const aw=document.getElementById('autoWonBtn');
+  const al=document.getElementById('autoLostBtn');
+  if(aw) aw.addEventListener('click',()=>{ autoWon=true;  startMatch(); });
+  if(al) al.addEventListener('click',()=>{ autoWon=false; startMatch(); });
+  const rb=document.getElementById('resetBtn');
+  if(rb) rb.addEventListener('click',resetAll);
+}
+
+function startMatch(){
+  screen='match'; elapsed=0; periodIdx=-1;
+  buzz(100); render();
+  timer=setInterval(()=>{
+    elapsed++;
+    const ni=periods.findIndex(p=>elapsed>=p.start&&elapsed<p.end);
+    if(ni>=0&&ni!==periodIdx){ if(periodIdx>=0) buzz(200); periodIdx=ni; }
+    if(elapsed>=TOTAL){ clearInterval(timer); screen='end'; buzz(500); render(); return; }
+    tickUpdate();
+  },1000);
+}
+
+function resetAll(){
+  clearInterval(timer);
+  allChecks.forEach(c=>checks[c]=false);
+  screen='checklist'; autoWon=null; elapsed=0; periodIdx=-1; timer=null;
+  render();
+}
+
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
+render();
+</script>
+</body>
+</html>
